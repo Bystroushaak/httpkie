@@ -1,0 +1,112 @@
+Easy to use downloader library based on urllib/urllib2 with automatic cookie handling.
+
+Now with HTTP proxy support!
+
+== Examples
+{{{
+>>> from httpkie import Downloader
+}}}
+
+=== Downloading
+{{{
+>>> d = Downloader()
+>>> data = d.download("http://kitakitsune.org")
+>>> len(data)
+5039
+}}}
+
+=== GET / POST requests
+
+{{{
+>>> print d.download("http://kitakitsune.org/bhole/params.php", get = {"test":"1"})
+POST:<br>
+
+
+<br>
+<br>
+GET:<br>
+test = 1<br>
+}}}
+
+GET and POST:
+
+{{{
+>>> print d.download("http://kitakitsune.org/bhole/params.php", get = {"test":"1"}, post = {"asd":"bsd"})
+POST:<br>
+asd = bsd<br>
+
+
+<br>
+<br>
+GET:<br>
+test = 1<br>
+}}}
+
+
+=== HEAD requests
+
+Head request just returns headers from server:
+
+{{{
+>>> d.download("http://kitakitsune.org/bhole/params.php", head = True)
+{'date': 'Mon, 23 Sep 2013 17:19:35 GMT', 'content-type': 'text/html', 'connection': 'close', 'vary': 'Accept-Encoding, Accept-Encoding', 'server': 'Microsoft-IIS/7.0'} 
+>>>
+}}}
+
+=== Cookies
+
+Cookies are stored in {{{.cookie}}} property:
+
+{{{
+>>> __ = d.download("http://seznam.cz")
+>>> d.cookies
+{'seznam.cz': {'hint': 'MTM3OTk1NjA4MCwwOw==', 'hw': '86400', 'ng': '1'}}
+}}}
+
+You can disable cookie support when creating {{{Downloader}}} object:
+
+{{{
+>>> d = Downloader(handle_cookies = False)
+>>> __ = d.download("http://seznam.cz")
+>>> d.cookies
+{}
+}}}
+
+or on the fly by modifing {{{.handle_cookies}}} propety:
+
+{{{
+>>> d.handle_cookies = True
+>>> __ = d.download("http://google.com")
+>>> d.cookies
+{'google.com': {'PREF': 'ID=fde710d5594f8a0c:FF=0:TM=1379956367:LM=1379956367:S=PELa4imTnfmLipde', 'NID': '67=DYj45bGEFEILRw38k_I5Iw53ZWIEkBQR--FMDnFlkuA8oDnaMYaCyzybw-wfMe6hyhLOYiad6zDQDq61KLva2djr2Y3Md0ngXmps9KU2jWuF1e5ln1cwQPgwv6rLvlKo'}}
+}}}
+
+=== Headers from server
+
+Headers from server can be found in {{{.response_headers}}} property:
+
+{{{
+>>> d = Downloader()
+>>> __ = d.download("http://google.com")
+>>> d.response_headers
+{'x-xss-protection': '1; mode=block', 'set-cookie': 'PREF=ID=8da5ec1e8551a4e3:FF=0:TM=1379956922:LM=1379956922:S=FMzhY8BNZ7qC3KvK; expires=Wed, 23-Sep-2015 17:22:02 GMT; path=/; domain=.google.cz, NID=67=KFn1lXkEUy4cUuBsgW3_H5Munx0XzLsjcXDhXHivsf3zc9q3lFOCEfPOohvgG1fSTebBgaSQU9Gs5bo6tXdAiLSp5rehCJy_qIghDtPPvYM85OP0PlOJYMH_T9iS642b; expires=Tue, 25-Mar-2014 17:22:02 GMT; path=/; domain=.google.cz; HttpOnly', 'expires': '-1', 'server': 'gws', 'connection': 'close', 'cache-control': 'private, max-age=0', 'date': 'Mon, 23 Sep 2013 17:22:02 GMT', 'p3p': 'CP="This is not a P3P policy! See http://www.google.com/support/accounts/bin/answer.py?hl=en&answer=151657 for more info."', 'content-type': 'text/html; charset=UTF-8', 'x-frame-options': 'SAMEORIGIN'}
+>>> 
+}}}
+
+=== Request headers
+
+You can use your own headers by using {{{headers}}} keyword as parameter to {{{Downloader}}} class, or by modifying {{{.headers}}} property. 
+
+There are also predefined module variables {{{IEHeaders}}} (internet explorer 7, windows XP) and {{{LFFHeaders}}} (Firefox 23, Ubuntu linux x86).
+
+Default headers are {{{IEHeaders}}}.
+
+=== HTTP proxy
+
+Each Downloader instance can use own HTTP proxy. You can set it as {{{http_proxy}}} parameter to {{{Downloader}}} class, or by modifying {{{.htt_proxy}}} property.
+
+Correct format of argument is {{{"server:port"}}}.
+
+HTTP proxy is sometimes better than [[http://en.wikipedia.org/wiki/SOCKS|SOCKS proxy]], because it is handled on different layer of TCP/IP. You can have multiple Downloader instances using multiple proxies, but only one SOCKS proxy in you whole program.
+
+For easy to use SOCKS proxy support, see [[https://github.com/Bystroushaak/IPtools|IPTools]], which are based on excelent [[http://socksipy.sourceforge.net/|SocksiPy module]].
