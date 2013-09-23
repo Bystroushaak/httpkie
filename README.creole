@@ -103,7 +103,7 @@ Default headers are {{{IEHeaders}}}.
 
 === HTTP proxy
 
-Each Downloader instance can use own HTTP proxy. You can set it as {{{http_proxy}}} parameter to {{{Downloader}}} class, or by modifying {{{.htt_proxy}}} property.
+Each Downloader instance can use own HTTP proxy. You can set it as {{{http_proxy}}} parameter to {{{Downloader}}} class, or by modifying {{{.http_proxy}}} property.
 
 Correct format of argument is {{{"server:port"}}}.
 
