@@ -63,7 +63,9 @@ class Downloader():
 		self.cookies = {}
 		self.handle_cookies = True
 
-		self.http_proxy = {'http': http_proxy} if http_proxy is not None else http_proxy
+		self.http_proxy = None
+		if http_proxy is not None:
+			self.http_proxy = {'http': http_proxy}
 
 
 	def download(self, url, get = None, post = None, head = None):
@@ -110,11 +112,10 @@ class Downloader():
 
 		# http proxy support
 		opener = None
-		if self.http_proxy == None:
+		if self.http_proxy is None:
 			opener = urllib2.build_opener()
 		else:
-			proxy_handler = urllib2.ProxyHandler({'http': '203.191.150.11:8081'})
-			opener = urllib2.build_opener(proxy_handler)
+			opener = urllib2.build_opener(urllib2.ProxyHandler(self.http_proxy))
 
 		# download page and save headers from server
 		f = opener.open(url_req)
