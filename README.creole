@@ -2,6 +2,13 @@ Easy to use downloader library based on urllib/urllib2 with automatic cookie han
 
 Now with HTTP proxy support!
 
+== Installation 
+httpkie is on [[https://pypi.python.org/pypi/httpkie|pypi]], so you can install it using {{{pip}}}:
+
+{{{
+pip install httpkie
+}}}
+
 == Examples
 {{{
 >>> from httpkie import Downloader
@@ -109,4 +116,18 @@ Correct format of argument is {{{"server:port"}}}.
 
 HTTP proxy is sometimes better than [[http://en.wikipedia.org/wiki/SOCKS|SOCKS proxy]], because it is handled on different layer of TCP/IP. You can have multiple Downloader instances using multiple proxies, but only one SOCKS proxy in you whole program.
 
-For easy to use SOCKS proxy support, see [[https://github.com/Bystroushaak/IPtools|IPTools]], which are based on excelent [[http://socksipy.sourceforge.net/|SocksiPy module]].
+For easy to use SOCKS proxy support, see [[https://github.com/Bystroushaak/IPtools|IPTools]], which are based on excellent [[http://socksipy.sourceforge.net/|SocksiPy module]].
+
+=== Redirects
+You can disable redirects if you don't want {{{httpkie}}} to follow them by adding {{{disable_redirect=True}}} keyword when you are creating instance of Downloader:
+
+{{{
+d = Downloader(disable_redirect=True)
+}}}
+
+or by modifying {{{.disable_redirect}}} property:
+
+{{{
+d = Downloader()
+d.disable_redirect = True
+}}}
