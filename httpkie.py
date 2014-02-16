@@ -36,6 +36,18 @@ LFFHeaders = {
 
 
 #= Functions & objects ========================================================
+class NoRedirectHandler(urllib2.HTTPRedirectHandler):
+	def http_error_302(self, req, fp, code, msg, headers):
+		infourl = urllib.addinfourl(fp, headers, req.get_full_url())
+		infourl.status = code
+		infourl.code = code
+		return infourl
+	http_error_300 = http_error_302
+	http_error_301 = http_error_302
+	http_error_303 = http_error_302
+	http_error_307 = http_error_302
+
+
 class Downloader():
 	"""
 	Lightweight class utilizing downloads from internet.
@@ -49,19 +61,26 @@ class Downloader():
 		.handle_cookies
 	"""
 
-	def __init__(self, headers = None, handle_cookies = True, http_proxy = None):
+	def __init__(self,
+		         headers=None,
+		         handle_cookies=True,
+		         http_proxy=None,
+		         disable_redirect=False):
 		"""
 		You can set:
 
 		headers -- default IEHeaders, but there is also LFFHeaders
-		handle_cookies -- set to false if you don't wish to automatically handle cookies
+		handle_cookies -- set to false if you don't wish to automatically
+		                  handle cookies
 		http_proxy -- 'url:port' describing HTTP proxy
+		disable_redirect -- dont follow 300/301/302/307 redirects
 		"""
 		self.headers = headers if headers is not None else IEHeaders
 		self.response_headers = None
 
 		self.cookies = {}
 		self.handle_cookies = True
+		self.disable_redirect = disable_redirect
 
 		self.http_proxy = None
 		if http_proxy is not None:
@@ -72,16 +91,17 @@ class Downloader():
 		"""
 		Parameters:
 		url -- set url to download, automatically adds htt:// if not present
-		get -- dict with GET parameters 
+		get -- dict with GET parameters
 		post -- dict with POST parameters
 		head -- set to True if you wish to use HEAD request. Returns headers from
 		server.
 		"""
 		# POST params
 		if post is not None:
-			if type(post) != dict:
+			if type(post) not in [dict, str] :
 				raise TypeError("Unknown type of post paramters.")
-			post = urllib.urlencode(post)
+			if type(post) == dict:
+				post = urllib.urlencode(post)
 
 		# append GET params to url
 		if get is not None:
@@ -110,15 +130,22 @@ class Downloader():
 		if head is not None:
 			url_req.get_method = lambda: "HEAD"
 
+		# redirect disabling support
+		if self.disable_redirect:
+			urllib2.install_opener(urllib2.build_opener(NoRedirectHandler))
+		else:
+			urllib2.install_opener(
+				urllib2.build_opener(urllib2.HTTPRedirectHandler)
+			)
+
 		# http proxy support
 		opener = None
-		if self.http_proxy is None:
-			opener = urllib2.build_opener()
-		else:
+		if self.http_proxy is not None:
 			opener = urllib2.build_opener(urllib2.ProxyHandler(self.http_proxy))
+			urllib2.install_opener(opener)
 
 		# download page and save headers from server
-		f = opener.open(url_req)
+		f = urllib2.urlopen(url_req)
 		data = f.read()
 		self.response_headers = f.info().items()
 		f.close()
@@ -169,7 +196,7 @@ class Downloader():
 
 			tmp_cookies[keyword] = value
 
-		# append global variable cookis with new cookies
+		# append global variable cookies with new cookies
 		if len(tmp_cookies) > 0:
 			domain = self.__getDomain(url)
 
