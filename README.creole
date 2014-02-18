@@ -3,7 +3,7 @@ Easy to use downloader library based on urllib/urllib2 with automatic cookie han
 Now with HTTP proxy support!
 
 == Installation 
-httpkie is on [[https://pypi.python.org/pypi/httpkie|pypi]], so you can install it using {{{pip}}}:
+httpkie is hosted at [[https://pypi.python.org/pypi/httpkie|pypi]], so you can install it using {{{pip}}}:
 
 {{{
 pip install httpkie
